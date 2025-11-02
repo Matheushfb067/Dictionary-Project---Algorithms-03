@@ -1,13 +1,14 @@
 /*
-    Cauã de Souza Flauzino, GES, 410    
-    Júlia Pereira Garcia Caputo, GES, 687
+    Cauï¿½ de Souza Flauzino, GES, 410    
+    Jï¿½lia Pereira Garcia Caputo, GES, 687
     Luana Roland Severini, GES, 363
-    Luis Antônio Ribeiro Teles, GEC, 2223
+    Luis Antï¿½nio Ribeiro Teles, GEC, 2223
     Matheus Henrique Ferreira Braz, GES, 636
 */
 
 #include <iostream>
 #include <string>
+#include <list>
 #include <locale>
  
 using namespace std;
@@ -18,26 +19,58 @@ struct Palavra
     string portugues; // Significado principal/primeiro
     float x, y, z;
 };
- 
-// Variáveis globais
-const int MAX_PALAVRAS = 1000; // Dicionário com, no máximo, 1000 palavras
-const int MAX_ARESTAS = 10; // Máximo de 10 significados por palavra
- 
+
+struct treenode{
+  Palavra info;
+  struct treenode * left;
+  struct treenode * right;
+};
+
+void tInsert(treenode* &p, Palavra novaPalavra){
+    if(p == NULL){
+        p = new treenode;
+        p -> info = novaPalavra;
+        p -> left = NULL;
+        p -> right = NULL;
+    }else if(novaPalavra.ficticia < p -> info.ficticia){
+        tInsert(p -> left, novaPalavra);
+    }else{ 
+        tInsert(p -> right, novaPalavra);
+    }
+}
+
+treenode* tSearch(treenode* p, Palavra palavra){
+    if(p == NULL){
+        return NULL;
+    }else if(palavra.ficticia == p -> info.ficticia){
+        return p;
+    }else{
+        if(palavra.ficticia < p-> info.ficticia)
+            return tSearch(p -> left, palavra);
+        else
+            return tSearch(p -> right, palavra);
+    }
+}
+
+// VariÃ¡veis globais
+const int MAX_PALAVRAS = 1000; // DicionÃ¡rio com, no mÃ¡ximo, 1000 palavras
+const int MAX_ARESTAS = 10; // MÃ¡ximo de 10 significados por palavra
+
 Palavra dicionario[MAX_PALAVRAS];
-string adj[MAX_PALAVRAS][MAX_ARESTAS];   // Lista de adjacência (significados)
+string adj[MAX_PALAVRAS][MAX_ARESTAS];   // Lista de adjacï¿½ncia (significados)
 int qtdSignificados[MAX_ARESTAS] = {0}; // Contagem de significados para cada palavra
 int totalPalavras = 0;
 
 void cadastrarPalavra()
 {
     cout << "\n--- Cadastro de Palavra ---\n";
-    cout << "Digite a palavra fictícia: ";
+    cout << "Digite a palavra fictï¿½cia: ";
     string nomeFicticio;
     cin >> nomeFicticio;
  
     int indicePalavra = -1;
     
-    // Busca se a palavra já existe
+    // Busca se a palavra jï¿½ existe
     for (int i = 0; i < totalPalavras; i++)
     {
         if (dicionario[i].ficticia == nomeFicticio)
@@ -55,7 +88,7 @@ void cadastrarPalavra()
             cout << "Limite de significados atingido para esta palavra!\n";
             return;
         }
-        cout << "Palavra '" << nomeFicticio << "' já existe. Digite um novo significado em português: ";
+        cout << "Palavra '" << nomeFicticio << "' jï¿½ existe. Digite um novo significado em portuguï¿½s: ";
         string novoSignificado;
         cin >> novoSignificado;
  
@@ -65,21 +98,21 @@ void cadastrarPalavra()
         cout << "Novo significado adicionado com sucesso!\n";
     }
     
-	// Se não encontrou, cadastra uma nova palavra
+	// Se nï¿½o encontrou, cadastra uma nova palavra
     else
     {
         if (totalPalavras >= MAX_PALAVRAS)
         {
-            cout << "Limite de palavras no dicionário atingido!\n";
+            cout << "Limite de palavras no dicionï¿½rio atingido!\n";
             return;
         }
         dicionario[totalPalavras].ficticia = nomeFicticio;
-        cout << "Digite o primeiro significado em português: ";
+        cout << "Digite o primeiro significado em portuguï¿½s: ";
         cin >> dicionario[totalPalavras].portugues;
         cout << "Digite as coordenadas (x y z): ";
         cin >> dicionario[totalPalavras].x >> dicionario[totalPalavras].y >> dicionario[totalPalavras].z;
  
-        // Adiciona o primeiro significado à lista de adjacência
+        // Adiciona o primeiro significado ï¿½ lista de adjacï¿½ncia
         adj[totalPalavras][0] = dicionario[totalPalavras].portugues;
         qtdSignificados[totalPalavras] = 1;
  
@@ -97,7 +130,7 @@ void listarSignificados()
     }
  
     string nome;
-    cout << "\nDigite a palavra fictícia: ";
+    cout << "\nDigite a palavra fictï¿½cia: ";
     cin >> nome;
  
     bool encontrada = false;
@@ -117,7 +150,7 @@ void listarSignificados()
     }
  
     if (!encontrada)
-        cout << "Palavra não encontrada!\n";
+        cout << "Palavra nï¿½o encontrada!\n";
 }
  
 void listarSinonimos()
@@ -129,7 +162,7 @@ void listarSinonimos()
     }
  
     string nome;
-    cout << "\nDigite a palavra fictícia: ";
+    cout << "\nDigite a palavra fictï¿½cia: ";
     cin >> nome;
  
     int indiceBusca = -1;
@@ -144,7 +177,7 @@ void listarSinonimos()
  
     if (indiceBusca == -1)
     {
-        cout << "Palavra não encontrada!\n";
+        cout << "Palavra nï¿½o encontrada!\n";
         return;
     }
 
@@ -155,38 +188,38 @@ void listarSinonimos()
     }
  
     bool achouSinonimo = false;
-    bool jaImpresso[MAX_PALAVRAS] = {false}; // Vetor para não imprimir duplicados
+    bool jaImpresso[MAX_PALAVRAS] = {false}; // Vetor para nï¿½o imprimir duplicados
  
     // Para cada significado da palavra original...
     for (int i = 0; i < qtdSignificados[indiceBusca]; i++)
     {
         string significadoAtual = adj[indiceBusca][i];
  
-        // ...procure em todas as outras palavras do dicionário...
+        // ...procure em todas as outras palavras do dicionï¿½rio...
         for (int j = 0; j < totalPalavras; j++)
         {
             if (j == indiceBusca)
-                continue; // Pula a própria palavra
+                continue; // Pula a prï¿½pria palavra
             cout << endl;
  
             // ...e em todos os significados dela.
             for (int k = 0; k < qtdSignificados[j]; k++)
             {
-                // Se encontrar um significado em comum e ainda não foi impresso
+                // Se encontrar um significado em comum e ainda nï¿½o foi impresso
                 if (adj[j][k] == significadoAtual && !jaImpresso[j])
                 {
                     cout << "  >>> Encontrou significado em comum! <<<\n";
                     cout << "- " << dicionario[j].ficticia << endl;
                     jaImpresso[j] = true; // Marca como impresso
                     achouSinonimo = true;
-                    break; // Vai para a próxima palavra do dicionário
+                    break; // Vai para a prï¿½xima palavra do dicionï¿½rio
                 }
             }
         }
     }
  
     if (!achouSinonimo)
-        cout << "Nenhum sinônimo encontrado.\n";
+        cout << "Nenhum sinï¿½nimo encontrado.\n";
 }
  
 void listarOrdemAlfabetica()
@@ -206,7 +239,7 @@ void removerPalavra()
  
 void calcularSimilaridade()
 {
-    cout << "Funcionalidade em construção...\n";
+    cout << "Funcionalidade em construï¿½ï¿½o...\n";
 }
  
 int main()
@@ -219,13 +252,13 @@ int main()
         cout << "\n===== MENU =====\n";
         cout << "1. Cadastrar palavra\n";
         cout << "2. Listar significados de uma palavra\n";
-        cout << "3. Listar sinônimos de uma palavra\n";
-        cout << "4. Listar palavras em ordem alfabética\n";
+        cout << "3. Listar sinï¿½nimos de uma palavra\n";
+        cout << "4. Listar palavras em ordem alfabï¿½tica\n";
         cout << "5. Listar palavras por tamanho\n";
         cout << "6. Remover palavra\n";
         cout << "7. Calcular similaridade entre duas palavras\n";
         cout << "0. Sair\n";
-        cout << "Escolha uma opção: ";
+        cout << "Escolha uma opï¿½ï¿½o: ";
         cin >> opcao;
  
         switch (opcao)
@@ -255,7 +288,7 @@ int main()
             cout << "Encerrando o programa...\n";
             break;
         default:
-            cout << "Opção inválida!\n";
+            cout << "Opï¿½ï¿½o invï¿½lida!\n";
         }
     } while (opcao != 0);
  
